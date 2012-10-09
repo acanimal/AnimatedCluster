@@ -139,6 +139,17 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                 var feature, clustered, cluster;
                 for(var i=0; i<this.features.length; ++i) {
                     feature = this.features[i];
+                    
+                    // Check if the feature's geometry is on the map's viewport,
+                    // if so then manages it, otherwise ignore.
+                    if(this.layer && this.layer.map) {
+                        var screenBounds = this.layer.map.getExtent();
+                        var featureBounds = feature.geometry.getBounds();
+                        if(!screenBounds.intersectsBounds(featureBounds)) {
+                            continue;
+                        }
+                    }  
+                    
                     if(feature.geometry) {
                         // Cluster for the current resolution
                         clustered = false;
