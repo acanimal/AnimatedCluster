@@ -1,11 +1,6 @@
 AnimatedCluster strategy for OpenLayers
 =======================================
 
-Implementation of a cluster strategy that animates cluster when zoom changes.
-=======
-AnimatedCluster
-===============
-
 Cluster strategy for OpenLayers that animates clusters on zoom change.
 
 A living demo can be found at in the [demo site](http://acuriousanimal.com/code/animatedCluster/).
