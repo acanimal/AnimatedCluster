@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 by Antonio Santiago <asantiagop_at_gmail_dot_com>
+/* Copyright (c) 2013 by Antonio Santiago <asantiagop_at_gmail_dot_com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -116,9 +116,10 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
      *     result of a moveend event.
      */
     cluster: function(event) {
-        
+
         var resolution = this.layer.map.getResolution();
-        
+        var isPan = (event && event.type=="moveend" && !event.zoomChanged);
+
         // Each time clusters are animated we need to call layer.redraw to show
         // position changes. This produces layer will be redrawn and a call to 
         // cluster is made.
@@ -127,14 +128,21 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
             return;
         }
         
-        if((!event || event.zoomChanged) && this.features) {
-            if(resolution != this.resolution || !this.clustersExist()) { 
+        if((!event || event.zoomChanged || isPan) && this.features) {
+
+            if(resolution != this.resolution || !this.clustersExist() || isPan) { 
+
                 if(resolution != this.resolution) {
                     this.zoomIn = (!this.resolution || (resolution <= this.resolution));
                 }
-                this.previousResolution = this.resolution;
-                this.previousClusters = this.clusters;
-                this.resolution = resolution;
+
+                // Only store previous data if we are changing zoom level
+                if(!isPan) {
+                    this.previousResolution = this.resolution;
+                    this.previousClusters = this.clusters;
+                    this.resolution = resolution;
+                }
+
                 var clusters = [];
                 var feature, clustered, cluster;
                 for(var i=0; i<this.features.length; ++i) {
@@ -229,6 +237,9 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                         }
                     }
                     
+                    // If we are panning then don't animate the cluster
+                    if(isPan) return;
+
                     // Make animation
                     if(!this.animationTween) {
                         this.animationTween = new OpenLayers.Tween(this.animationMethod);
