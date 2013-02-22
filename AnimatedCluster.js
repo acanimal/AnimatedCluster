@@ -136,12 +136,10 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                     this.zoomIn = (!this.resolution || (resolution <= this.resolution));
                 }
 
-                // Only store previous data if we are changing zoom level
-                if(!isPan) {
-                    this.previousResolution = this.resolution;
-                    this.previousClusters = this.clusters;
-                    this.resolution = resolution;
-                }
+                // Store previous data if we are changing zoom level
+                this.previousResolution = this.resolution;
+                this.previousClusters = this.clusters;
+                this.resolution = resolution;
 
                 var clusters = [];
                 var feature, clustered, cluster;
@@ -208,6 +206,12 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                 // Get the initial and final position of each cluster required
                 // make the animation
                 if(this.clusters.length > 0 && this.previousClusters) {
+
+                    // Before clustering stop any animation
+                    if(this.animationTween) {
+                       this.animationTween.stop();
+                    }
+
                     var clustersA, clustersB;
                     if(this.zoomIn) {
                         clustersA = this.clusters;
@@ -238,13 +242,12 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                     }
                     
                     // If we are panning then don't animate the cluster
-                    if(isPan) return;
+                    if(isPan && !this.animating) return;
 
                     // Make animation
                     if(!this.animationTween) {
                         this.animationTween = new OpenLayers.Tween(this.animationMethod);
                     }
-                    this.animationTween.stop();
                     this.animating = true;
                     this.animationTween.start({
                         x: 0.0, 
@@ -264,7 +267,7 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                                     delete clusters[i].cluster._geometry;
                                 }
 
-                                // If zooming out then remove the previous cluster and
+                                // If zooming out then remove the previous cluster
                                 // and the current one
                                 if(!this.zoomIn) {
                                     this.clustering = true;
@@ -321,6 +324,8 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
     animate: function(delta) { 
         var clusters = this.zoomIn ? this.clusters : this.previousClusters;
         for(var i=0; i<clusters.length; i++) {
+            if(!clusters[i]._geometry) continue;
+
             var dx = (clusters[i]._geometry.destx - clusters[i]._geometry.origx) * delta.x;
             var dy = (clusters[i]._geometry.desty - clusters[i]._geometry.origy) * delta.y;
                     
