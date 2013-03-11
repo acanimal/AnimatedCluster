@@ -242,7 +242,11 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                     }
                     
                     // If we are panning then don't animate the cluster
-                    if(isPan && !this.animating) return;
+                    if(isPan && !this.animating){
+                      // Make sure that layer gets redrawn, even if it is just a pan.
+                      this.layer.redraw();
+                      return;
+                    }
 
                     // Make animation
                     if(!this.animationTween) {
