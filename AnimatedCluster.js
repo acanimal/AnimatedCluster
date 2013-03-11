@@ -58,25 +58,29 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
      * {OpenLayers.Tween} Animated panning tween object.
      */
     animationTween: null,
+    
     /**
      * Property: previousResolution
      * {Float} The previous resolution of the map.
      */
     previousResolution: null,
+    
     /**
-     * Property: previousResolution
+     * Property: previousClusters
      * {Array(<OpenLayers.Feature.Vector>)} Clusters of features at previous
      * resolution.
      */
     previousClusters: null,
+    
     /**
      * Property: animating
      * {Boolean} Indicates if we are in the process of clusters animation.
      */
     animating: false,
+    
     /**
-     * Property: animating
-     * {Boolean} Indicates if we are zooming in our zoomin out.
+     * Property: zoomIn
+     * {Boolean} Indicates if we are zooming in or zooming out.
      */
     zoomIn: true,
 
