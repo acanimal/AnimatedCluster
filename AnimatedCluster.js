@@ -226,7 +226,8 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                     }
                     for(var i=0; i< clustersA.length; i++) {
                         var ca = clustersA[i];
-                        var cb = this.findFeaturesInClusters(ca.cluster, clustersB);
+                        var caFeatures = ca.cluster || [ca]; // either a cluster of features or a single feature
+                        var cb = this.findFeaturesInClusters(caFeatures, clustersB);
                         if(cb) {
                             ca._geometry = {};
                             if(this.zoomIn) {
@@ -272,7 +273,14 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
                                 // Remove the temporal attributes
                                 var clusters = this.zoomIn ? this.clusters : this.previousClusters;
                                 for(var i=0; i< clusters.length; i++) {
-                                    delete clusters[i].cluster._geometry;
+                                    // if is this really a cluster and not a feature
+                                    if (clusters[i].attributes.count) { 
+                                        if (clusters[i].cluster._geometry) {
+                                            delete clusters[i].cluster._geometry;                                        
+                                        } else if (clusters[i]._geometry) {
+                                            delete clusters[i]._geometry;
+                                        }
+                                    }
                                 }
 
                                 // If zooming out then remove the previous cluster
@@ -311,11 +319,14 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
             var feature = features[i];
             for(var j=0; j<clusters.length; j++) {
                 var cluster = clusters[j];
-                var clusterFeatures = clusters[j].cluster;
-                for(var k=0; k<clusterFeatures.length; k++) {
-                    if(feature.id == clusterFeatures[k].id) {
-                        return cluster;
-                    }
+                // if cluster is really cluster not a feature
+                if (cluster.attributes.count) { 
+                    var clusterFeatures = clusters[j].cluster;
+                    for(var k=0; k<clusterFeatures.length; k++) {
+                        if(feature.id == clusterFeatures[k].id) {
+                            return cluster;
+                        }
+                    }           
                 }
             }
         }
