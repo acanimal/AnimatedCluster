@@ -27,7 +27,7 @@
  */
 
 /**
- * @requires OpenLayers/Strategy/Cluster
+ * @requires OpenLayers/Strategy/Cluster.js
  */
 
 /**
