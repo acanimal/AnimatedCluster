@@ -110,7 +110,15 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
             this.animationTween = null;
         }
     },
-    
+    /**
+     * Redraw features.
+     */
+    redraw: function() {
+        // After removeAllFeatures and/or destroyFeatures is called it removes only clusters
+        // but but they don't affect the original features the clustering strategy holds in cache.
+        // Changing the clustering strategy resolution forces the addFeatures() to redraw features.
+        this.resolution = -1;
+    },
     /**
      * Method: cluster
      * Cluster features based on some threshold distance.
