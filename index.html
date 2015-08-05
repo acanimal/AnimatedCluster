@@ -1,0 +1,305 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>AnimatedCluster Strategy Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Antonio Santiago">
+        <meta name="descriptions" content="Test for the AnimatedCluster Strategy for OpenLayers which animated the cluster on zoomin/zoomout actions.">
+        <meta name="keywords" content="OpenLayers, Strategy, Cluster, AnimatedCluster, Animation, Tween" />
+
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Tangerine&amp;v1" />
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" />
+        <link rel="stylesheet" type="text/css" href="style/style.css" />
+
+        <link href="style/prettify.css" type="text/css" rel="stylesheet" />
+        <link href="style/sunburst.css" type="text/css" rel="stylesheet" />
+        <script type="text/javascript" src="style/prettify.js"></script>
+
+        <script src="./ol/OpenLayers.js"></script>
+        <script src="./AnimatedCluster.js"></script>
+
+        <style>
+            #header {
+                height: 100px;
+            }
+            #content {
+                width: 920px;
+                padding-bottom: 25px;
+                font-size: 14px;
+            }
+            .map {
+                -webkit-box-shadow:  5px 5px 5px 0px rgba(0, 0, 0, 0.5);
+                box-shadow:  5px 5px 5px 0px rgba(0, 0, 0, 0.5);
+                -webkit-border-radius: 7px;
+                border-radius: 7px;
+                width: 90%;
+                height: 300px;
+                margin-bottom: 20px;
+            }
+            #map1, #map2 {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+
+    <body onload="prettyPrint();">
+        <div id="main">
+            <div id="header">
+                <div id="logo">
+                    <h1>Animated<a href="#">Cluster</a> v0.2</h1>
+                    <div class="slogan">Cool animations for the cluster strategy</div>
+                </div>
+            </div>
+            <div id="site_content">
+                <div id="content">
+
+                    <h2>Test 1: Random features</h2>
+                    <p>Next sample shows the use of <code>OpenLayers.Strategy.AnimatedCluster</code> with a vector
+                        layer filled with 2000 random features:</p>
+
+
+                    <div class="map">
+                        <div id="map2"></div>
+                    </div>
+                    <pre class="prettyprint">
+// Create a vector layers
+var vector = new OpenLayers.Layer.Vector("Features", {
+    renderers: ['Canvas','SVG'],
+    strategies: [
+        new OpenLayers.Strategy.AnimatedCluster({
+            distance: 45,
+            animationMethod: OpenLayers.Easing.Expo.easeOut,
+            animationDuration: 20
+        })
+    ],
+    styleMap:  new OpenLayers.StyleMap(style)
+});
+map.addLayer(vector);
+
+// Create some random features
+var features = [];
+for(var i=0; i< 50000; i++) {
+    var lon = Math.random() * 2 + -4;
+    var lat = Math.random() * 2 + 40;
+
+    var lonlat = new OpenLayers.LonLat(lon, lat);
+    lonlat.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+
+    var f = new OpenLayers.Feature.Vector( new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat));
+    features.push(f);
+}
+vector.addFeatures(features);
+                    </pre>
+
+                    <h1>OpenLayers.Strategy.AnimatedCluster</h1>
+                    <p>AnimatedCluster is an OpenLayers strategy for the vector layers that animates cluster when zoom changed.
+                        A nice post presenting the current implementation can be found at <a href="http://acuriousanimal.com/blog">http://acuriousanimal.com/</a>.</p>
+
+                    <h2>Test 2: Features from a GeoJSON file</h2>
+                    <p>Next sample shows the use of <code>OpenLayers.Strategy.AnimatedCluster</code> 
+                        loading data from a GeoJSON file containing the most important cities of the world</p>
+
+                    <div class="map">
+                        <div id="map1"></div>
+                    </div>
+                    <pre class="prettyprint">
+var vector = new OpenLayers.Layer.Vector("Features", {
+    protocol: new OpenLayers.Protocol.HTTP({
+        url: "world_cities.json",
+        format: new OpenLayers.Format.GeoJSON()
+    }),
+    renderers: ['Canvas','SVG'],
+    strategies: [
+        new OpenLayers.Strategy.Fixed(),
+        new OpenLayers.Strategy.AnimatedCluster({
+            distance: 45,
+            animationMethod: OpenLayers.Easing.Expo.easeOut,
+            animationDuration: 10
+        })
+    ],
+    styleMap:  new OpenLayers.StyleMap(style)
+});
+map.addLayer(vector);
+                    </pre>                    
+
+                    <h2>Compatibility</h2>
+                    <p>At this moment the AnimatedCluster has only been tested with OpenLayers 2.11</p>
+
+                    <h2>Features</h2>
+                    <ol>
+                        <li><code>OpenLayers.Strategy.AnimatedCluster</code> is a direct subclass of the <code>OpenLayers.Strategy.Cluster</code> 
+                            strategy class extending by adding animation of clusters when zoom level changes.</li>
+                        <li>100% pure OpenLayers. No external library has been used.</li>
+                        <li>Animations are based on the <code>OpenLayers.Tween</code> class</li>
+                    </ol>
+                </div>
+            </div>
+            <div id="footer">
+                <p>Copyright &copy; <a href="http://acuriousanimal.com/">Antonio Santiago</a> | Design from <a href="http://www.html5webtemplates.co.uk">HTML5webtemplates.co.uk</a></p>
+            </div>
+        </div>
+
+        <script>
+            // Create a map and add OSM raster layer as the base layer
+            var map1 = new OpenLayers.Map("map1");
+            var osm1 = new OpenLayers.Layer.OSM();
+            map1.addLayer(osm1);
+            
+            // Initial view location
+            var center = new OpenLayers.LonLat(2, 40);
+            center.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+            map1.setCenter(center, 2);
+            // Add a LayerSwitcher control
+            map1.addControl(new OpenLayers.Control.LayerSwitcher());
+            
+            // Define three colors that will be used to style the cluster features
+            // depending on the number of features they contain.
+            var colors = {
+                low: "rgb(181, 226, 140)", 
+                middle: "rgb(241, 211, 87)", 
+                high: "rgb(253, 156, 115)"
+            };
+            
+            // Define three rules to style the cluster features.
+            var lowRule = new OpenLayers.Rule({
+                filter: new OpenLayers.Filter.Comparison({
+                    type: OpenLayers.Filter.Comparison.LESS_THAN,
+                    property: "count",
+                    value: 15
+                }),
+                symbolizer: {
+                    fillColor: colors.low,
+                    fillOpacity: 0.9, 
+                    strokeColor: colors.low,
+                    strokeOpacity: 0.5,
+                    strokeWidth: 12,
+                    pointRadius: 10,
+                    label: "${count}",
+                    labelOutlineWidth: 1,
+                    fontColor: "#ffffff",
+                    fontOpacity: 0.8,
+                    fontSize: "12px"
+                }
+            });
+            var middleRule = new OpenLayers.Rule({
+                filter: new OpenLayers.Filter.Comparison({
+                    type: OpenLayers.Filter.Comparison.BETWEEN,
+                    property: "count",
+                    lowerBoundary: 15,
+                    upperBoundary: 50
+                }),
+                symbolizer: {
+                    fillColor: colors.middle,
+                    fillOpacity: 0.9, 
+                    strokeColor: colors.middle,
+                    strokeOpacity: 0.5,
+                    strokeWidth: 12,
+                    pointRadius: 15,
+                    label: "${count}",
+                    labelOutlineWidth: 1,
+                    fontColor: "#ffffff",
+                    fontOpacity: 0.8,
+                    fontSize: "12px"
+                }
+            });
+            var highRule = new OpenLayers.Rule({
+                filter: new OpenLayers.Filter.Comparison({
+                    type: OpenLayers.Filter.Comparison.GREATER_THAN,
+                    property: "count",
+                    value: 50
+                }),
+                symbolizer: {
+                    fillColor: colors.high,
+                    fillOpacity: 0.9, 
+                    strokeColor: colors.high,
+                    strokeOpacity: 0.5,
+                    strokeWidth: 12,
+                    pointRadius: 20,
+                    label: "${count}",
+                    labelOutlineWidth: 1,
+                    fontColor: "#ffffff",
+                    fontOpacity: 0.8,
+                    fontSize: "12px"
+                }
+            });
+            
+            // Create a Style that uses the three previous rules
+            var style = new OpenLayers.Style(null, {
+                rules: [lowRule, middleRule, highRule]
+            });            
+
+            // Create a vector layers
+            var vector1 = new OpenLayers.Layer.Vector("Features", {
+                protocol: new OpenLayers.Protocol.HTTP({
+                    url: "world_cities.json",
+                    format: new OpenLayers.Format.GeoJSON()
+                }),
+                renderers: ['Canvas','SVG'],
+                strategies: [
+                    new OpenLayers.Strategy.Fixed(),
+                    new OpenLayers.Strategy.AnimatedCluster({
+                        distance: 45,
+                        animationMethod: OpenLayers.Easing.Expo.easeOut,
+                        animationDuration: 10
+                    })
+                ],
+                styleMap:  new OpenLayers.StyleMap(style)
+            });
+            map1.addLayer(vector1);
+
+            // Create a map and add OSM raster layer as the base layer
+            var map2 = new OpenLayers.Map("map2");
+            var osm2 = new OpenLayers.Layer.OSM();
+            map2.addLayer(osm2);
+            
+            // Initial view location
+            var center = new OpenLayers.LonLat(2, 40);
+            center.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+            map2.setCenter(center, 5);
+            // Add a LayerSwitcher control
+            map2.addControl(new OpenLayers.Control.LayerSwitcher());  
+
+            // Create a vector layers
+            var vector2 = new OpenLayers.Layer.Vector("Features", {
+                renderers: ['Canvas','SVG'],
+                strategies: [
+                    new OpenLayers.Strategy.AnimatedCluster({
+                        distance: 45,
+                        animationMethod: OpenLayers.Easing.Expo.easeOut,
+                        animationDuration: 20
+                    })
+                ],
+                styleMap:  new OpenLayers.StyleMap(style)
+            });
+            map2.addLayer(vector2);
+            
+            // Create some random features
+            var features = [];
+            for(var i=0; i< 50000; i++) {
+                var lon = Math.random() * 2 + -4;
+                var lat = Math.random() * 2 + 40;
+                
+                var lonlat = new OpenLayers.LonLat(lon, lat);
+                lonlat.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+
+                var f = new OpenLayers.Feature.Vector( new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat));
+                features.push(f);
+            }
+            vector2.addFeatures(features);
+            
+            
+        </script>
+
+  <script type="text/javascript">
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-8297669-4']);
+	  _gaq.push(['_trackPageview']);
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>
+    </body>
+</html>
