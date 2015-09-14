@@ -145,7 +145,7 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
             if(resolution != this.resolution || !this.clustersExist() || isPan) { 
 
                 if(resolution != this.resolution) {
-                    this.zoomIn = (!this.resolution || (resolution <= this.resolution));
+                    this.zoomIn = (!this.resolution || ((resolution <= this.resolution)||(resolution > this.resolution)));
                 }
 
                 // Store previous data if we are changing zoom level
