@@ -356,8 +356,16 @@ OpenLayers.Strategy.AnimatedCluster = OpenLayers.Class(OpenLayers.Strategy.Clust
             var dx = (clusters[i]._geometry.destx - clusters[i]._geometry.origx) * delta.x;
             var dy = (clusters[i]._geometry.desty - clusters[i]._geometry.origy) * delta.y;
                     
-            clusters[i].geometry.x = clusters[i]._geometry.origx + dx;
-            clusters[i].geometry.y = clusters[i]._geometry.origy + dy; 
+            // added test for instance when clusters[i].geometry is null
+            if (clusters[i].hasOwnProperty("geometry") && clusters[i].geometry != null) {
+                clusters[i].geometry.x = clusters[i]._geometry.origx + dx;
+                clusters[i].geometry.y = clusters[i]._geometry.origy + dy;
+            }
+            else{
+                clusters[i].geometry = new OpenLayers.Geometry();
+                clusters[i].geometry.x = clusters[i]._geometry.origx + dx;
+                clusters[i].geometry.y = clusters[i]._geometry.origy + dy;
+            } 
         }
         this.layer.redraw();
     },    
